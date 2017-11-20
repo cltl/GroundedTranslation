@@ -123,11 +123,16 @@ class NIC:
                       U_regularizer=l2(self.l2reg),
                       name='rnn')(merged_input)
 
+        rnn_to_output = TimeDistributed(Dense(output_dim=self.embed_size,
+                                              input_dim=self.hidden_size,
+                                              W_regularizer=l2(self.l2reg)),
+                                        name='rnn_to_output')(rnn)
+        
         output = TimeDistributed(Dense(output_dim=self.vocab_size,
-                                       input_dim=self.hidden_size,
+                                       input_dim=self.embed_size,
                                        W_regularizer=l2(self.l2reg),
                                        activation='softmax'),
-                                       name='output')(rnn)
+                                       name='output')(rnn_to_output)
 
         if self.optimiser == 'adam':
             # allow user-defined hyper-parameters for ADAM because it is
